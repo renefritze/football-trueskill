@@ -84,7 +84,15 @@ def print_table(teams):
         rows.append([r, c[0], '{:1f}'.format(c[1][0].mu), s[0], s[1][1].points])
     print(tabulate.tabulate(rows))
 
-csv_filename = '2016.csv'
-teams = { t: (ts.Rating(), ClassicRanking()) for t in _team_names(csv_filename) }
-process_season(csv_filename, teams)
-print_table(teams)
+
+def process_file(csv_filename):
+    teams = { t: (ts.Rating(), ClassicRanking()) for t in _team_names(csv_filename) }
+    process_season(csv_filename, teams)
+    print_table(teams)
+
+try:
+    fn = sys.argv[1]
+except IndexError:
+    fn = 'data/german_bundesliga/2016.csv'
+
+process_file(fn)
