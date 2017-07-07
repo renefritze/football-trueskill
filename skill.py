@@ -4,6 +4,7 @@ import sys
 import csv
 import trueskill as ts
 import pprint
+import tabulate
 
 class ClassicRanking(object):
 
@@ -20,6 +21,28 @@ class ClassicRanking(object):
         elif goals_scored == goals_conceded:
             self.points += 1
 
+    @property
+    def goal_diff(self):
+        return self.goals_scored - self.goals_conceded
+
+    def __lt__(self, other):
+        if self.points < other.points:
+            return True
+        if self.points > other.points:
+            return False
+        # self.points == other.points
+        if self.goal_diff < other.goal_diff:
+            return True
+        if self.goal_diff > other.goal_diff:
+            return False
+        # self.goal_diff == other.goal_diff
+        if self.goals_scored < other.goals_scored:
+            return True
+        if self.goals_scored > other.goals_scored:
+            return False
+        raise RuntimeError
+
+
 def _team_names(fn):
     ret = set()
     with open(fn) as csvfile:
@@ -27,6 +50,7 @@ def _team_names(fn):
         for row in reader:
             ret.add(row['HomeTeam'])
     return ret
+
 
 def process_season(fn, teams):
     with open(fn) as csvfile:
@@ -48,12 +72,19 @@ def process_season(fn, teams):
             classic_away.score_game(score_away, score_home)
             teams[home], teams[away] = (ranking_home, classic_home), (ranking_away, classic_away)
 
-teamcount = 18
+
+def print_table(teams):
+    skillteams = sorted(teams.items(), key=lambda var: var[1][0])
+    skillteams.reverse()
+    classicteams = sorted(teams.items(), key=lambda var: var[1][1])
+    classicteams.reverse()
+    ranks = ['{:02d}.'.format(i) for i in range(1, len(skillteams)+1)]
+    rows = [['Pos', 'TrueSkill', 'mu', 'Classic', 'pts'],]
+    for r, c, s in zip(ranks, skillteams, classicteams):
+        rows.append([r, c[0], '{:1f}'.format(c[1][0].mu), s[0], s[1][1].points])
+    print(tabulate.tabulate(rows))
+
 csv_filename = '2016.csv'
 teams = { t: (ts.Rating(), ClassicRanking()) for t in _team_names(csv_filename) }
-
 process_season(csv_filename, teams)
-
-teams = sorted(teams.items(), key=lambda var: var[1][0])
-teams.reverse()
-pprint.pprint(teams)
+print_table(teams)
