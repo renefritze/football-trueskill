@@ -5,7 +5,7 @@ description = "Compare league placements with classical scoring vs. TrueSkill(tm
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
-requires-python = ">=3.12"
+requires-python = ">=3.14"
 dependencies = [
     "tabulate>=0.9",
     "trueskill>=0.4.5",
@@ -29,7 +29,7 @@ build-backend = "uv_build"
 
 [tool.ruff]
 line-length = 88
-target-version = "py312"
+target-version = "py314"
 
 [tool.ruff.lint]
 select = ["E", "W", "F", "I", "B", "UP", "SIM", "RUF", "PTH"]

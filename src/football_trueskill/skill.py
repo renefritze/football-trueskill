@@ -33,7 +33,7 @@ class ClassicRanking:
     def _sort_key(self) -> tuple[int, int, int]:
         return self.points, self.goal_diff, self.goals_scored
 
-    def __lt__(self, other: "ClassicRanking") -> bool:
+    def __lt__(self, other: ClassicRanking) -> bool:
         return self._sort_key() < other._sort_key()
 
 
